@@ -3,7 +3,6 @@ import speech_recognition as sr
 import pyttsx3
 import time
 
-# ===================== LOCAL LLM (OLLAMA) =====================
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL = "mistral"
 
@@ -30,7 +29,6 @@ def ask_llm(prompt, memory_context=""):
     response.raise_for_status()
     return response.json()["response"].strip()
 
-# ===================== MEMORY =====================
 def build_memory_context():
     return (
         "Ahsen went to New York. "
@@ -38,7 +36,7 @@ def build_memory_context():
         "She never came back."
     )
 
-# ===================== NAME FIX =====================
+
 def normalize_text(text):
     corrections = {
         "austin": "ahsen",
@@ -48,7 +46,7 @@ def normalize_text(text):
     }
     return " ".join(corrections.get(w, w) for w in text.lower().split())
 
-# ===================== VOICE =====================
+
 tts = pyttsx3.init()
 voices = tts.getProperty("voices")
 
@@ -67,7 +65,7 @@ def speak(text):
     tts.runAndWait()
     time.sleep(0.1)  # prevents Windows audio lock
 
-# ===================== OVERRIDES =====================
+
 def emotional_override(text):
     if "she came back" in text or "ahsen came back" in text:
         return "No, she didn’t. If she had, you wouldn’t be guessing."
@@ -77,13 +75,13 @@ def emotional_override(text):
 
     return None
 
-# ===================== SPEECH INPUT =====================
+
 recognizer = sr.Recognizer()
 mic = sr.Microphone()
 
 speak("Yeah. I'm here. Talk.")
 
-# ===================== MAIN LOOP =====================
+
 while True:
     try:
         with mic as source:
@@ -100,13 +98,13 @@ while True:
         text = normalize_text(raw)
         print(f"[YOU]: {text}")
 
-        # 🔥 OVERRIDE PATH — NOW SPEAKS
+      
         forced = emotional_override(text)
         if forced:
             speak(forced)
             continue
 
-        # NORMAL AI RESPONSE
+   
         try:
             reply = ask_llm(text, build_memory_context())
         except Exception:
@@ -118,3 +116,4 @@ while True:
     except KeyboardInterrupt:
         speak("Finally. Silence.")
         break
+
